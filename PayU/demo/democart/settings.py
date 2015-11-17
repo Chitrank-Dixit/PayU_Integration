@@ -2,6 +2,7 @@
 import os
 import sys
 
+
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 
 DEBUG = True
@@ -156,8 +157,11 @@ LOGGING = {
     }
 }
 
-PAYU_INFO = {'merchant_key': "C0Dr8m",
-             'merchant_salt': "3sf0jURk",
+# hash 
+
+
+PAYU_INFO = {'merchant_key': "gtKFFx",
+             'merchant_salt': "eCwWELxi",
              # for production environment use 'https://secure.payu.in/_payment'
-             'payment_url': 'https://test.payu.in/_payment',
+             'payment_url': 'https://test.payu.in/_payment/',
 }

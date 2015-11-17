@@ -8,10 +8,11 @@ from django.core.urlresolvers import reverse
 from payu.forms import PayUForm
 from cart.forms import OrderForm
 
-from django.contrib.webdesign.lorem_ipsum import sentence as lorem_ipsum
+#from django.contrib.webdesign.lorem_ipsum import sentence as lorem_ipsum
 from uuid import uuid4
 from random import randint
 import logging
+from hashlib import sha512
 
 logger = logging.getLogger('django')
 
@@ -19,8 +20,14 @@ def checkout(request):
     if request.method == 'POST':
         order_form = OrderForm(request.POST)
         if order_form.is_valid():
+            
             initial = order_form.cleaned_data
+            print initial['amount']
+            payu_hash = str(sha512(settings.PAYU_INFO['merchant_key'] + '|' + initial["txnid"] + '|' + str(initial['amount']) + '|' + initial["productinfo"] + '|' + initial["firstname"] + '|' + initial["email"] + '|||||||||||' + settings.PAYU_INFO["merchant_salt"]).hexdigest())
+            print settings.PAYU_INFO['merchant_key'], initial['txnid']
+            print payu_hash
             initial.update({'key': settings.PAYU_INFO['merchant_key'],
+                            'hash': payu_hash,
                             'surl': request.build_absolute_uri(reverse('order.success')),
                             'furl': request.build_absolute_uri(reverse('order.success')),
                             'curl': request.build_absolute_uri(reverse('order.cancel'))})
@@ -38,7 +45,7 @@ def checkout(request):
                 return HttpResponse(status=500)
     else:
         initial = {'txnid': uuid4().hex,
-                'productinfo': lorem_ipsum(),
+                'productinfo': "Home",
                 'amount': randint(100, 1000)/100.0}
         order_form = OrderForm(initial=initial)
     context = {'form': order_form}
